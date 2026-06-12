@@ -236,12 +236,13 @@ def project_permuted_sims(index, args, conf):
                                                  conf=conf, 
                                                  sim_params=params_current,
                                                  seed_highz=conf['projection']['highz_synfast_seed'] + params_current['id_param']*10000 + index_perm,
-                                                 parslist_all=parslist_all)
+                                                 parslist_all=parslist_all,
+                                                 test=args.test)
 
     return files_variants
 
 
-def project_single_permuted_sim(probe_kernels, shell_weights, perms_info, shell_groups, dirpath_out, conf, sim_params, seed_highz, parslist_all):
+def project_single_permuted_sim(probe_kernels, shell_weights, perms_info, shell_groups, dirpath_out, conf, sim_params, seed_highz, parslist_all, test=False):
         
     # report
     LOGGER.info(f"=================>  path_par={sim_params['path_par']}")
@@ -324,7 +325,10 @@ def project_single_permuted_sim(probe_kernels, shell_weights, perms_info, shell_
         probe_maps = utils_projection.add_highest_redshift_shell(probe_maps, probe_kernels, sim_params, parslist_all, seed=seed_highz)
 
         # cell check
-        probe_cells = check_cls_for_probes(probe_maps, probe_kernels, sim_params)    
+        if not test:
+            probe_cells = check_cls_for_probes(probe_maps, probe_kernels, sim_params)    
+        else:
+            probe_cells = None
 
         # output files and store
         filepath_out = get_filepath_projected_maps(dirpath_out, variant)
@@ -391,7 +395,10 @@ def project_single_sim(index, args, conf):
         probe_maps = utils_projection.add_highest_redshift_shell(probe_maps, nz_info, sim_params=sim_current, parslist_all=parslist_all, seed=index+1231)
         del(shells)
 
-        probe_cells = check_cls_for_probes(probe_maps, nz_info, sim_current)
+        if not args.test:
+            probe_cells = check_cls_for_probes(probe_maps, nz_info, sim_current)
+        else:
+            probe_cells = None
 
         # output files and store
         filepath_out = get_filepath_projected_maps(dirpath_out, variant)
